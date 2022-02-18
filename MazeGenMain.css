@@ -1,0 +1,23 @@
+#sig-canvas {
+    width: 500px;
+    height: 500px;
+    padding: 0;
+    margin: auto;
+    display: block;
+}
+canvas{
+    border: 1px hotpink;
+}
+body{
+    background-repeat: no-repeat;
+    background: rgb(98,0,255);
+    background: linear-gradient(219deg, rgba(98,0,255,1) 0%, rgba(211,180,247,1) 24%, rgba(49,105,239,1) 93%, rgba(0,187,255,1) 100%) fixed;
+}
+#mazecanvas{
+    alignment: center;
+}
+button{
+    margin: auto;
+    padding: 0;
+    display: block;
+}

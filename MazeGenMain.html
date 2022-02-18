@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Maze</title>
+  <link rel="stylesheet" href="MazeGenMain.css">
+</head>
+<body>
+<div id="mazecanvas">
+<canvas id="sig-canvas">Your browser doesn't support canvas.</canvas>
+</div>
+<button onclick="NewMaze(z)">NewMaze</button>
+<script>
+  var canvas = document.getElementById("sig-canvas");
+  var ctx = canvas.getContext("2d")
+  var scale = 1;
+  canvas.width = 500 * scale;
+  canvas.height = 500 * scale;
+
+  var z = 1;
+
+  function NewMaze(current){
+    z = RandSelect(current);
+    console.log(z)
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawhorslop(z);
+    drawvertslop(z);
+  }
+
+  function RandSelect(){
+    //var randInt = 1
+    do {
+      var randInt = Math.floor(Math.random() * 4);
+      console.log(randInt);
+    } while (randInt === z);
+    console.log(randInt)
+    return(randInt);
+  }
+
+  let horizontals = [[
+    [1,1,0,1,1],
+    [0,1,1,1,0],
+    [1,0,1,0,1],
+    [1,0,1,1,0],
+    [0,1,1,1,1],
+    [1,1,1,1,0]
+  ],[
+    [0,1,1,1,1],
+    [1,1,0,1,0],
+    [0,1,1,1,0],
+    [1,1,0,1,1],
+    [0,1,0,1,1],
+    [1,1,1,1,0]
+  ],[
+    [1,1,0,1,1],
+    [1,0,1,1,0],
+    [0,1,0,1,1],
+    [0,1,1,1,0],
+    [0,0,1,0,1],
+    [1,1,1,1,0]
+  ],[
+    [1,1,1,0,1],
+    [0,1,1,0,0],
+    [0,0,0,1,0],
+    [0,0,1,0,0],
+    [1,1,1,0,0],
+    [1,1,1,1,1]
+  ],[
+    [0,1,1,1,1],
+    [0,0,0,0,0],
+    [0,0,0,0,0],
+    [0,0,0,0,0],
+    [0,0,0,0,0],
+    [1,1,1,1,0]
+  ]];
+
+  let verticals = [[
+    [1,0,0,0,0,1],
+    [1,0,1,0,0,1],
+    [1,0,0,1,0,1],
+    [1,0,1,0,0,1],
+    [1,0,0,0,0,1]
+  ],[
+    [1,0,0,1,0,1],
+    [1,0,0,0,0,1],
+    [1,0,0,1,0,1],
+    [1,0,0,0,0,1],
+    [1,0,1,0,0,1]
+  ],[
+    [1,0,0,0,0,1],
+    [1,0,1,0,0,1],
+    [1,1,0,0,0,1],
+    [1,1,0,0,1,1],
+    [1,0,0,1,0,1]
+  ],[
+    [1,0,0,0,0,1],
+    [1,1,1,0,1,1],
+    [1,1,1,0,1,1],
+    [1,0,0,1,1,1],
+    [0,0,0,0,1,1]
+  ],[
+    [1,0,0,0,0,1],
+    [1,0,0,0,0,1],
+    [1,0,0,0,0,1],
+    [1,0,0,0,0,1],
+    [1,0,0,0,0,1]
+  ]];
+  console.table(horizontals);
+  console.log(horizontals[1][1]);
+  console.table(verticals);
+  console.log(verticals[1][1]);
+
+  function drawhorslop(z) {
+    ctx.beginPath();
+    for(y in horizontals[z]){
+      var x = 0
+      while (x <= horizontals[z][y].length){
+        if (horizontals[z][y][x] == 1){
+          ctx.moveTo(x*100,y*100);
+          ctx.lineTo(x*100+100,y*100);
+          ctx.stroke();
+        } else {
+        }
+        x = x + 1
+      }
+    }
+  }
+
+  function drawvertslop(z) {
+    for(y in verticals[z]){
+      var x = 0
+      while (x <= verticals[z][y].length){
+        if (verticals[z][y][x] == 1){
+          ctx.moveTo(x*100,y*100);
+          ctx.lineTo(x*100,y*100+100);
+          ctx.stroke();
+        } else {
+        }
+        x = x + 1
+      }
+    }
+  }
+
+  `function drawhor() {
+        for(y in horizontals){
+            let x = 0
+            while (x <= horizontals[y].length){
+                if(horizontals[y][x] === 1){
+                    ctx.moveTo(x*100,y*100)
+
+                } else {
+                    ++x
+                }
+            }
+        }
+    }`
+</script>
+</body>
+</html>
