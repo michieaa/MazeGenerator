@@ -11,24 +11,23 @@
 </div>
 <button onclick="NewMaze(z)">NewMaze</button>
 <script>
-  var canvas = document.getElementById("sig-canvas");
-  var ctx = canvas.getContext("2d")
+  var canvas = document.getElementById("sig-canvas"); //Specifies canvas to draw on
+  var ctx = canvas.getContext("2d") //Sets ctx as a 2d 'plane' of the canvas
   var scale = 1;
   canvas.width = 500 * scale;
   canvas.height = 500 * scale;
 
-  var z = 1;
+  var z = 1; //Value for the currently selected maze
 
   function NewMaze(current){
     z = RandSelect(current);
     console.log(z)
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawhorslop(z);
+    ctx.clearRect(0, 0, canvas.width, canvas.height); //This may not clear certain canvas objects
+    drawhorslop(z); //Horizontal must be called first as it begins a new path.
     drawvertslop(z);
   }
 
-  function RandSelect(){
-    //var randInt = 1
+  function RandSelect(){ //Random number within the range of z-indexes
     do {
       var randInt = Math.floor(Math.random() * 4);
       console.log(randInt);
@@ -37,6 +36,8 @@
     return(randInt);
   }
 
+  //Horizontal lines organised to be visually accurate when displayed in a table (z,y,x)
+  // Includes outside boundary lines
   let horizontals = [[
     [1,1,0,1,1],
     [0,1,1,1,0],
@@ -74,6 +75,8 @@
     [1,1,1,1,0]
   ]];
 
+  //Vertical lines organised to be visually accurate when displayed in a table (z,y,x)
+  // Includes outside boundary lines
   let verticals = [[
     [1,0,0,0,0,1],
     [1,0,1,0,0,1],
@@ -110,8 +113,8 @@
   console.table(verticals);
   console.log(verticals[1][1]);
 
-  function drawhorslop(z) {
-    ctx.beginPath();
+  function drawhorslop(z) { //Loops through the horizontal matrix to draw the horizontal lines
+    ctx.beginPath(); //Begins new path: necessary for current clearing method.
     for(y in horizontals[z]){
       var x = 0
       while (x <= horizontals[z][y].length){
@@ -126,7 +129,7 @@
     }
   }
 
-  function drawvertslop(z) {
+  function drawvertslop(z) { //Similar logic to drawhorslop, but for vertical lines.
     for(y in verticals[z]){
       var x = 0
       while (x <= verticals[z][y].length){
@@ -141,19 +144,6 @@
     }
   }
 
-  `function drawhor() {
-        for(y in horizontals){
-            let x = 0
-            while (x <= horizontals[y].length){
-                if(horizontals[y][x] === 1){
-                    ctx.moveTo(x*100,y*100)
-
-                } else {
-                    ++x
-                }
-            }
-        }
-    }`
 </script>
 </body>
 </html>
