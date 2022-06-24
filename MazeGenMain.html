@@ -9,8 +9,15 @@
 <div id="mazecanvas">
   <canvas id="sig-canvas">Your browser doesn't support canvas.</canvas>
 </div>
-<button onclick="NewMaze(z)">NewMaze</button>
-<button onclick="NewerMaze()">NewerMaze</button>
+<div id="usercontrol">
+Select your maze size: <select id="mazeSizes">
+  <option>5x5</option>
+  <option>10x10</option>
+  <option>15x15</option>
+  <option>25x25</option>
+</select>
+<button onclick="NewerMaze()">Generate Maze</button>
+</div>
 <script>
   var canvas = document.getElementById("sig-canvas"); //Specifies canvas to draw on
   var ctx = canvas.getContext("2d") //Sets ctx as a 2d 'plane' of the canvas
@@ -18,24 +25,6 @@
   canvas.width = 500 * scale;
   canvas.height = 500 * scale;
 
-  var z = 1; //This is the value for the currently selected maze
-
-  function NewMaze(current){
-    z = RandSelect(current);
-    console.log(z)
-    ctx.clearRect(0, 0, canvas.width, canvas.height); //This may not clear certain canvas objects
-    drawhorslop(z); //Horizontal must be called first as it begins a new path.
-    drawvertslop(z);
-  }
-
-  function RandSelect(){ //Random number within the range of z-indexes
-    do {
-      var randInt = Math.floor(Math.random() * 4);
-      console.log(randInt);
-    } while (randInt === z);
-    console.log(randInt)
-    return(randInt);
-  }
   //Horizontal lines organised to be visually accurate when displayed in a table (z,y,x)
   // Includes outside boundary lines
   let horizontals = [
@@ -55,8 +44,8 @@
     [1,1,1,1,1,1],
     [1,1,1,1,1,1]
   ];
-  console.table(horizontals);
-  console.table(verticals);
+  //console.table(horizontals);
+  //console.table(verticals);
 testiterator = 0
 
   mazecells = [
@@ -70,88 +59,152 @@ testiterator = 0
 
   adjcells = []
 
+  function getOption() {
+    var obj = document.getElementById("mazeSizes");
+    selection = obj.options[obj.selectedIndex].text;
+  }
+
+  function ConvDim(selection){
+
+    if(selection == '5x5') {
+      dim = 5
+    }
+    if(selection == '10x10') {
+      dim = 10
+    }
+    if(selection == '15x15') {
+      dim = 15
+    }
+    if(selection == '25x25'){
+      dim = 25
+    }
+    return dim;
+  }
+
   function NewerMaze() {
+    var obj = document.getElementById("mazeSizes");
+    selection = obj.options[obj.selectedIndex].text;
+    dimension = ConvDim(selection);
+    DimensionMaze(dimension);
     ResetMaze();
+    let index = 0;
     while(mazefront.length>0){
       testiterator = testiterator + 1
-      console.log(testiterator)
-      let index = RandIndex();
-      //CheckAdj(index)
-      adjcells.splice(0,adjcells.length)
-      mazeFrontIndex = index
-      if(mazefront[mazeFrontIndex][1]+1 < mazecells[0].length) {
-        if (mazecells[mazefront[mazeFrontIndex][0]][mazefront[mazeFrontIndex][1] + 1] === 0) {
-          adjcells.push(1)
-        }
-      }
-      if(mazefront[mazeFrontIndex][1]-1 != -1) {
-        if (mazecells[mazefront[mazeFrontIndex][0]][mazefront[mazeFrontIndex][1] - 1] === 0) {
-          adjcells.push(2)
-        }
-      }
-      if(mazefront[mazeFrontIndex][0]+1 < mazecells.length ) {
-        if (mazecells[mazefront[mazeFrontIndex][0] + 1][mazefront[mazeFrontIndex][1]] === 0) {
-          adjcells.push(3)
-        }
-      }
-      if (mazefront[mazeFrontIndex][0]-1 != -1) {
-        if ((mazecells[mazefront[mazeFrontIndex][0] - 1][mazefront[mazeFrontIndex][1]] === 0)) {
-          adjcells.push(4)
-        }
-      }
-      console.log(adjcells)
-      if(adjcells.length === 0){
-        mazefront.splice(index,1)
-      } else{
-        let randAdj = Math.floor(Math.random() * adjcells.length)
-        if(adjcells[randAdj] == 1){
-          mazefront.push([mazefront[index][0], mazefront[index][1]+1])
-          mazecells[mazefront[index][0]][mazefront[index][1]+1] = 1
-          verticals[mazefront[index][0]][mazefront[index][1]+1] = 0
-        } else if(adjcells[randAdj] == 2){
-          mazefront.push([mazefront[index][0], mazefront[index][1]-1])
-          mazecells[mazefront[index][0]][mazefront[index][1]-1] = 1
-          verticals[mazefront[index][0]][mazefront[index][1]] = 0
-        } else if(adjcells[randAdj] == 3){
-          mazefront.push([mazefront[index][0]+1, mazefront[index][1]])
-          mazecells[mazefront[index][0]+1][mazefront[index][1]] = 1
-          horizontals[mazefront[index][0]+1][mazefront[index][1]] = 0
-        } else if(adjcells[randAdj] == 4){
-          mazefront.push([mazefront[index][0]-1, mazefront[index][1]])
-          mazecells[mazefront[index][0]-1][mazefront[index][1]] = 1
-          horizontals[mazefront[index][0]][mazefront[index][1]] = 0
-        }
-
-      }
+      //console.log(testiterator)
+      index = RandIndex();
+      CheckAdj(index)
+      ProgressAdj(index);
     }
-    drawhorslop(0)
-    drawvertslop(0)
+    DrawHor(dimension)
+    DrawVert(dimension)
+    console.log("done 2 draws")
+  }
+
+  function DimensionMaze(dim){
+    mazecells.splice(0,mazecells.length)
+    mazecells = new Array(dim); // create an empty array of length dim
+    for (var i = 0; i < dim; i++) {
+      mazecells[i] = new Array(dim); // make each element an array
+    }
+
+    horizontals.splice(0,horizontals.length)
+
+    horizontals = new Array(dim+1); // create an empty array of length dim
+    for (var i = 0; i <= dim; i++) {
+      horizontals[i] = new Array(dim); // make each element an array
+    }
+
+    //for(let i = 0; i <= dim; i++){
+    //  for(let j = 0; j < dim; j++){
+    //    horizontals[i][j] = 1;
+    //  }
+    //}
+    verticals.splice(0,horizontals.length)
+
+    verticals = new Array(dim); // create an empty array of length dim
+    for (var i = 0; i < dim; i++) {
+      verticals[i] = new Array(dim+1); // make each element an array
+    }
+
+    //for(let i = 0; i < dim; i++){
+    //  for(let j = 0; j <= dim; j++){
+    //    verticals[i][j] = 1
+    //  }
+    //}
+    mazefront.splice(0,mazefront.length)
+    mazefront = []
   }
 
   function ResetMaze(){ //Clears canvas for new maze to be drawn and resets matrices to initial values.
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for(i in mazecells){
-      for(j in mazecells[i]){
-        mazecells[i][j] = 0
+    //for(i in mazecells){
+    //  for(j in mazecells[i]){
+    //    mazecells[i][j] = 0
+    //  }
+    //}
+    //
+    //for(i in verticals){
+    //  for(j in verticals[i]){
+    //    verticals[i][j] = 1
+    //  }
+    //}
+    //for(i in horizontals){
+    //  for(j in horizontals[i]){
+    //    horizontals[i][j] = 1
+    //  }
+    //}
+
+    for (i = 0; i < mazecells.length; i++) {
+      for (var j = 0; j < mazecells[i].length; j++) {
+        mazecells[i][j] = 0;
       }
     }
-    for(i in verticals){
-      for(j in verticals[i]){
-        verticals[i][j] = 1
+    mazecells[0][0]=1;
+
+    for (i = 0; i < verticals.length; i++) {
+      for (var j = 0; j < verticals[i].length; j++) {
+        verticals[i][j] = 1;
       }
     }
-    for(i in horizontals){
-      for(j in horizontals[i]){
-        horizontals[i][j] = 1
+
+    for (i = 0; i < horizontals.length; i++) {
+      for (var j = 0; j < horizontals[i].length; j++) {
+        horizontals[i][j] = 1;
       }
     }
-    mazefront = [[0,0]]
+
+    mazefront.push([0,0])
   }
 
   function RandIndex(){
     return Math.floor(Math.random() * mazefront.length)
   }
 
+  function CheckAdj(index){
+    adjcells.splice(0,adjcells.length)
+    mazeFrontIndex = index
+    if(mazefront[mazeFrontIndex][1]+1 < mazecells[0].length) {
+      if (mazecells[mazefront[mazeFrontIndex][0]][mazefront[mazeFrontIndex][1] + 1] === 0) {
+        adjcells.push(1)
+      }
+    }
+    if(mazefront[mazeFrontIndex][1]-1 != -1) {
+      if (mazecells[mazefront[mazeFrontIndex][0]][mazefront[mazeFrontIndex][1] - 1] === 0) {
+        adjcells.push(2)
+      }
+    }
+    if(mazefront[mazeFrontIndex][0]+1 < mazecells.length ) {
+      if (mazecells[mazefront[mazeFrontIndex][0] + 1][mazefront[mazeFrontIndex][1]] === 0) {
+        adjcells.push(3)
+      }
+    }
+    if (mazefront[mazeFrontIndex][0]-1 != -1) {
+      if ((mazecells[mazefront[mazeFrontIndex][0] - 1][mazefront[mazeFrontIndex][1]] === 0)) {
+        adjcells.push(4)
+      }
+    }
+   // console.log(adjcells)
+  }
   // function CheckAdj(mazeFrontIndex){
   //   adjcells.splice(0,adjcells.length)
   //   if(mazecells[mazefront[mazeFrontIndex][0]][mazefront[mazeFrontIndex][1]+1] === 0){
@@ -168,8 +221,73 @@ testiterator = 0
   //   }
   // }
 
+  function ProgressAdj(index){
+    if(adjcells.length === 0){
+      mazefront.splice(index,1)
+    } else{
+      let randAdj = Math.floor(Math.random() * adjcells.length)
+      if(adjcells[randAdj] == 1){
+        mazefront.push([mazefront[index][0], mazefront[index][1]+1])
+        mazecells[mazefront[index][0]][mazefront[index][1]+1] = 1
+        verticals[mazefront[index][0]][mazefront[index][1]+1] = 0
+      } else if(adjcells[randAdj] == 2){
+        mazefront.push([mazefront[index][0], mazefront[index][1]-1])
+        mazecells[mazefront[index][0]][mazefront[index][1]-1] = 1
+        verticals[mazefront[index][0]][mazefront[index][1]] = 0
+      } else if(adjcells[randAdj] == 3){
+        mazefront.push([mazefront[index][0]+1, mazefront[index][1]])
+        mazecells[mazefront[index][0]+1][mazefront[index][1]] = 1
+        horizontals[mazefront[index][0]+1][mazefront[index][1]] = 0
+      } else if(adjcells[randAdj] == 4){
+        mazefront.push([mazefront[index][0]-1, mazefront[index][1]])
+        mazecells[mazefront[index][0]-1][mazefront[index][1]] = 1
+        horizontals[mazefront[index][0]][mazefront[index][1]] = 0
+      }
+    }
+  }
+
   function NewDraw(frontindex,direction){
 
+  }
+
+  function DrawHor(dim){
+    unit = Math.floor(500/dim)
+    ctx.beginPath(); //Begins new path: Allows for canvas to be more easily cleared.
+    var x = 0;
+    var temp = 0;
+    for(y in horizontals){
+      x = 0;
+      temp++;
+      while (x < horizontals[y].length){
+        if (horizontals[y][x] == 1){
+          ctx.moveTo(x*unit,y*unit);
+          ctx.lineTo((x+1)*unit,y*unit);
+          ctx.stroke();
+          console.log(temp, x*unit,y*unit);
+
+        } else {
+        }
+        x = x + 1
+      }
+    }
+    console.log("got to the end")
+  }
+
+  function DrawVert(dim){
+    unit = Math.floor(500/dim)
+    y = 0;
+    for(y in verticals){
+      var x = 0
+      while (x < verticals[y].length){
+        if (verticals[y][x] == 1){
+          ctx.moveTo(x*unit,Number(y)*unit);
+          ctx.lineTo(x*unit,(Number(y)+1)*unit);
+          ctx.stroke();
+        } else {
+        }
+        x = x + 1
+      }
+    }
   }
 
   //Loops through the horizontal matrix to draw the horizontal lines
@@ -196,7 +314,7 @@ testiterator = 0
       while (x <= verticals[y].length){
         if (verticals[y][x] == 1){
           ctx.moveTo(x*100,y*100);
-          ctx.lineTo(x*100,y*100+100);
+          ctx.lineTo(x*100,(y+1)*100);
           ctx.stroke();
         } else {
         }
